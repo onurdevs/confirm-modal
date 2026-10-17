@@ -6,7 +6,7 @@ Modern dialogs. Clear decisions. Effortless feedback.
 
 Confirm Modal brings Promise-based dialogs, confirmations, prompts, and toast notifications to the modern web. Built on native browser primitives, it combines a small footprint with thoughtful interaction defaults and a fully typed API. Zero runtime dependencies.
 
-[View on npm](https://www.npmjs.com/package/@onurdev/confirm-modal) · [Source on GitHub](https://github.com/onurdevs/confirm-modal)
+[Live demo](https://onurdevs.github.io/confirm-modal/) · [View on npm](https://www.npmjs.com/package/@onurdev/confirm-modal) · [Source on GitHub](https://github.com/onurdevs/confirm-modal)
 
 - **Native foundation.** Uses `<dialog>` and `showModal()` for modal interactions, with the Popover API for toast placement where available.
 - **Compact by design.** Approximately 8 kB gzipped for the browser bundle, including its embedded styles. Safe to import during server rendering.
@@ -214,6 +214,7 @@ npm install
 npm test          # 55 tests across browser-like and server environments
 npm run typecheck
 npm run build     # ESM, CommonJS, browser bundle, CSS, and type declarations
+npm run build:demo # Build the standalone demo in _site/ for GitHub Pages
 npx serve .       # Open /demo/ to explore the examples
 ```
 

@@ -37,6 +37,7 @@
     "zero-dependencies"
   ],
   "scripts": {
+    "build:demo": "npm run build && node build-demo.mjs",
     "build": "node build.mjs && tsc -p tsconfig.build.json",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
