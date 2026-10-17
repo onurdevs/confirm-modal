@@ -48,5 +48,13 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/onurdevs/confirm-modal.git"
+  },
+  "homepage": "https://github.com/onurdevs/confirm-modal#readme",
+  "bugs": {
+    "url": "https://github.com/onurdevs/confirm-modal/issues"
   }
 }
