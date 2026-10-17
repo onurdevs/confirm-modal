@@ -1,5 +1,7 @@
 # Confirm Modal
 
+[![CI](https://github.com/onurdevs/confirm-modal/actions/workflows/ci.yml/badge.svg)](https://github.com/onurdevs/confirm-modal/actions/workflows/ci.yml) [![npm](https://img.shields.io/npm/v/@onurdevs/confirm-modal)](https://www.npmjs.com/package/@onurdevs/confirm-modal)
+
 SweetAlert tarzı, Promise tabanlı modal, onay, prompt ve toast kütüphanesi. Daha modern, daha hafif, varsayılan olarak güvenli.
 
 - **Modern:** native `<dialog>` + `showModal()` (top layer, `inert` arka plan), toastlar için Popover API, CSS değişkenleriyle tema, otomatik koyu mod, `prefers-reduced-motion` desteği.
@@ -11,21 +13,21 @@ SweetAlert tarzı, Promise tabanlı modal, onay, prompt ve toast kütüphanesi. 
 ## Kurulum
 
 ```bash
-npm i confirm-modal
+npm i @onurdevs/confirm-modal
 ```
 
 ```js
-import modal from 'confirm-modal';
+import modal from '@onurdevs/confirm-modal';
 ```
 
 veya doğrudan sayfaya:
 
 ```html
-<script src="confirm-modal.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@onurdevs/confirm-modal"></script>
 <script>ConfirmModal.alert('Merhaba');</script>
 ```
 
-Stiller otomatik eklenir (constructable stylesheet, CSP'ye takılmaz). Kendi CSS'inizi yüklemek isterseniz `createModal({ injectStyles: false })` deyip `confirm-modal/style.css` dosyasını import edin.
+Stiller otomatik eklenir (constructable stylesheet, CSP'ye takılmaz). Kendi CSS'inizi yüklemek isterseniz `createModal({ injectStyles: false })` deyip `@onurdevs/confirm-modal/style.css` dosyasını import edin.
 
 ## Kullanım
 
@@ -62,7 +64,7 @@ modal.toast({ title: 'Yükleme başarısız', icon: 'error', action: { text: 'Te
 ### Varsayılanlar ve dil
 
 ```js
-import { createModal } from 'confirm-modal';
+import { createModal } from '@onurdevs/confirm-modal';
 
 export const modal = createModal({
   confirmText: 'Tamam',
@@ -164,5 +166,9 @@ npm test          # vitest + happy-dom, 47 test
 npm run build     # dist/: ESM, CJS, <script> build, CSS, .d.ts
 npx serve .       # sonra /demo/ adresini açın
 ```
+
+## Yayınlama
+
+`npm version patch` (veya `minor` / `major`) ve ardından `git push --follow-tags`. `v*` etiketi GitHub Actions'taki yayın akışını tetikler; testler geçerse paket provenance ile npm'e gönderilir.
 
 Tarayıcı desteği: `<dialog>` olan tüm güncel tarayıcılar (Chrome/Edge 37+, Firefox 98+, Safari 15.4+).
