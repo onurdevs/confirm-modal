@@ -1,0 +1,16 @@
+:root { color-scheme: light dark; font-family: system-ui, sans-serif; }
+body { margin: 0 auto; max-width: 960px; padding: 2rem 1rem 4rem; line-height: 1.5; }
+header p { color: GrayText; }
+h1 { margin-bottom: 0.25rem; }
+h2 { font-size: 1rem; text-transform: uppercase; letter-spacing: 0.06em; color: GrayText; margin-top: 2rem; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.5rem; }
+.grid button, .grid a, form button {
+  padding: 0.75rem 1rem; border: 1px solid #8884; border-radius: 10px; background: Canvas; color: CanvasText;
+  font: inherit; cursor: pointer; text-align: left; text-decoration: none;
+}
+.grid button:hover, .grid a:hover { border-color: #4f46e5; }
+form { display: flex; gap: 0.5rem; margin-top: 0.75rem; }
+form input { flex: 1; padding: 0.6rem 0.75rem; border-radius: 10px; border: 1px solid #8884; font: inherit; }
+pre { padding: 1rem; border-radius: 10px; background: #8881; overflow: auto; }
+.theme { float: right; margin-top: -3rem; }
+@media (max-width: 600px) { .theme { float: none; display: block; margin: 0 0 1rem; } }

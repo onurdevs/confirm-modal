@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Strict CSP + Trusted Types: the library works with no inline scripts or styles. -->
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https:; require-trusted-types-for 'script'; trusted-types confirm-modal">
+  <title>Confirm Modal — Demo</title>
+  <link rel="stylesheet" href="demo.css">
+  <script src="../dist/confirm-modal.min.js" defer></script>
+  <script src="demo.js" defer></script>
+</head>
+<body>
+  <header>
+    <h1>Confirm Modal</h1>
+    <p>SweetAlert tarzı, ama modern: native <code>&lt;dialog&gt;</code>, sıfır bağımlılık, ~8 kB gzip, XSS'e kapalı, sıkı CSP ile çalışır.</p>
+    <label class="theme">Tema
+      <select id="theme">
+        <option value="auto">Sistem</option>
+        <option value="light">Açık</option>
+        <option value="dark">Koyu</option>
+      </select>
+    </label>
+  </header>
+
+  <main>
+    <section>
+      <h2>Temel</h2>
+      <div class="grid">
+        <button data-demo="alert">Alert</button>
+        <button data-demo="success">Başarılı</button>
+        <button data-demo="error">Hata</button>
+        <button data-demo="confirm">Onay</button>
+        <button data-demo="danger">Tehlikeli işlem</button>
+        <button data-demo="deny">Kaydet / Kaydetme / Vazgeç</button>
+      </div>
+    </section>
+
+    <section>
+      <h2>Girdi</h2>
+      <div class="grid">
+        <button data-demo="prompt">Prompt</button>
+        <button data-demo="email">E-posta + doğrulama</button>
+        <button data-demo="select">Seçim listesi</button>
+        <button data-demo="radio">Radyo</button>
+        <button data-demo="checkbox">Onay kutusu</button>
+        <button data-demo="textarea">Uzun metin</button>
+      </div>
+    </section>
+
+    <section>
+      <h2>Gelişmiş</h2>
+      <div class="grid">
+        <button data-demo="preconfirm">Async işlem (preConfirm)</button>
+        <button data-demo="timer">Zamanlayıcı</button>
+        <button data-demo="html">Güvenli HTML</button>
+        <button data-demo="xss">XSS denemesi</button>
+        <button data-demo="queue">Kuyruk (3 modal)</button>
+        <button data-demo="abort">AbortSignal</button>
+      </div>
+    </section>
+
+    <section>
+      <h2>Toast</h2>
+      <div class="grid">
+        <button data-demo="toast">Bildirim</button>
+        <button data-demo="toast-error">Hata bildirimi + aksiyon</button>
+        <button data-demo="toast-bottom">Alt orta</button>
+      </div>
+    </section>
+
+    <section>
+      <h2>Deklaratif (JS yazmadan)</h2>
+      <p>Bu öğelerde sadece <code>data-cm-confirm</code> var:</p>
+      <div class="grid">
+        <a href="#cikis-yapildi" data-cm-confirm="Çıkış yapmak istiyor musunuz?">Çıkış yap (link)</a>
+        <button id="declarative-delete" data-cm-confirm="Bu kayıt kalıcı olarak silinecek." data-cm-title="Silinsin mi?" data-cm-confirm-text="Sil" data-cm-danger>Sil (buton)</button>
+      </div>
+      <form id="declarative-form" data-cm-confirm="Form gönderilsin mi?">
+        <input name="ad" placeholder="Adınız" aria-label="Adınız">
+        <button>Gönder (form)</button>
+      </form>
+    </section>
+
+    <section>
+      <h2>Son sonuç</h2>
+      <pre id="out" aria-live="polite">—</pre>
+    </section>
+  </main>
+</body>
+</html>

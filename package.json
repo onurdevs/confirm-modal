@@ -1,0 +1,52 @@
+{
+  "name": "confirm-modal",
+  "version": "0.1.0",
+  "description": "Modern, fast, secure and accessible Promise-based modal, confirm, prompt and toast library. Zero dependencies.",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/confirm-modal.cjs",
+  "module": "./dist/confirm-modal.js",
+  "types": "./dist/index.d.ts",
+  "unpkg": "./dist/confirm-modal.min.js",
+  "jsdelivr": "./dist/confirm-modal.min.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/confirm-modal.js",
+      "require": "./dist/confirm-modal.cjs"
+    },
+    "./style.css": "./dist/confirm-modal.css",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "modal",
+    "dialog",
+    "confirm",
+    "alert",
+    "prompt",
+    "toast",
+    "sweetalert",
+    "accessible",
+    "a11y"
+  ],
+  "scripts": {
+    "build": "node build.mjs && tsc -p tsconfig.build.json",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "size": "node build.mjs",
+    "prepublishOnly": "npm test && npm run build"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "happy-dom": "^21.0.3",
+    "typescript": "^5.9.3",
+    "vitest": "^5.0.5"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
