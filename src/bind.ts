@@ -12,8 +12,9 @@ const SELECTOR = '[data-cm-confirm]';
  *
  * Optional: data-cm-title, data-cm-confirm-text, data-cm-cancel-text, data-cm-danger, data-cm-icon.
  */
-export function bindConfirm(api: ModalApi, root: Document | HTMLElement = document): () => void {
+export function bindConfirm(api: ModalApi, root?: Document | HTMLElement): () => void {
   if (!isBrowser) return () => {};
+  root ??= document;
   const approved = new WeakSet<Element>();
 
   const ask = (el: HTMLElement) => {
@@ -22,8 +23,8 @@ export function bindConfirm(api: ModalApi, root: Document | HTMLElement = docume
     return api.confirm({
       title: d.cmTitle || message,
       text: d.cmTitle ? message : undefined,
-      confirmText: d.cmConfirmText,
-      cancelText: d.cmCancelText,
+      ...(d.cmConfirmText !== undefined ? { confirmText: d.cmConfirmText } : {}),
+      ...(d.cmCancelText !== undefined ? { cancelText: d.cmCancelText } : {}),
       danger: 'cmDanger' in d,
       icon: (d.cmIcon as any) || ('cmDanger' in d ? 'warning' : undefined),
     });

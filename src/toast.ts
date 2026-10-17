@@ -84,7 +84,11 @@ export function openToast(o: ToastOptions, nonce?: string, inject = true): Toast
   let startedAt = 0;
   let closing = false;
   let resolveClosed!: () => void;
-  const closed = new Promise<void>((r) => (resolveClosed = r));
+  let rejectClosed!: (reason: unknown) => void;
+  const closed = new Promise<void>((resolve, reject) => {
+    resolveClosed = resolve;
+    rejectClosed = reject;
+  });
 
   const start = () => {
     if (!duration || closing) return;
@@ -117,7 +121,12 @@ export function openToast(o: ToastOptions, nonce?: string, inject = true): Toast
         /* ignore */
       }
     }
-    o.onClose?.();
+    try {
+      o.onClose?.();
+    } catch (error) {
+      rejectClosed(error);
+      return;
+    }
     resolveClosed();
   }
 

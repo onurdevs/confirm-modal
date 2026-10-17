@@ -59,7 +59,7 @@ function render<V>(o: ModalOptions<V>, nonce?: string, inject = true): Promise<M
   if (o.signal?.aborted) return Promise.resolve(dismissed<V>('abort'));
   if (inject) injectStyles(nonce);
 
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const titleId = nextId('title');
     const contentId = nextId('content');
     const errorId = nextId('error');
@@ -191,7 +191,7 @@ function render<V>(o: ModalOptions<V>, nonce?: string, inject = true): Promise<M
     let settled = false;
     let busy = false;
 
-    const finish = async (result: ModalResult<V>) => {
+    const finish = async (result: ModalResult<V>, failure?: { error: unknown }) => {
       if (settled) return;
       settled = true;
       clearTimeout(timer);
@@ -204,9 +204,12 @@ function render<V>(o: ModalOptions<V>, nonce?: string, inject = true): Promise<M
       if (opener && opener.isConnected && typeof opener.focus === 'function') opener.focus({ preventScroll: true });
       try {
         o.onClose?.(result);
-      } finally {
-        resolve(result);
+      } catch (error) {
+        reject(error);
+        return;
       }
+      if (failure) reject(failure.error);
+      else resolve(result);
     };
 
     const dismiss = (reason: DismissReason) => {
@@ -241,6 +244,7 @@ function render<V>(o: ModalOptions<V>, nonce?: string, inject = true): Promise<M
       try {
         if (o.validate) {
           const msg = await o.validate(raw);
+          if (settled) return;
           if (msg) {
             setBusy(false);
             return showError(msg);
@@ -248,6 +252,7 @@ function render<V>(o: ModalOptions<V>, nonce?: string, inject = true): Promise<M
         }
         if (o.preConfirm) {
           const out = await o.preConfirm(value as V);
+          if (settled) return;
           if (out === false) {
             setBusy(false);
             return;
@@ -255,6 +260,7 @@ function render<V>(o: ModalOptions<V>, nonce?: string, inject = true): Promise<M
           if (out !== undefined) value = out;
         }
       } catch (e) {
+        if (settled) return;
         setBusy(false);
         return showError(e instanceof Error ? e.message : String(e));
       }
@@ -328,6 +334,11 @@ function render<V>(o: ModalOptions<V>, nonce?: string, inject = true): Promise<M
       dialog.focus();
     }
 
-    o.onOpen?.(dialog);
+    try {
+      o.onOpen?.(dialog);
+    } catch (error) {
+      // Keep the queue blocked until the failed dialog has been removed.
+      void finish(dismissed<V>('programmatic'), { error });
+    }
   });
 }

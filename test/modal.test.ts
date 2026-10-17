@@ -189,6 +189,40 @@ describe('shortcuts', () => {
 });
 
 describe('inputs', () => {
+  it.each(['abort', 'close'] as const)('does not run preConfirm after %s during validation', async (method) => {
+    let complete!: () => void;
+    const validation = new Promise<void>((resolve) => { complete = resolve; });
+    const preConfirm = vi.fn();
+    const ac = new AbortController();
+    const p = modal.fire({ validate: () => validation, preConfirm, signal: ac.signal });
+    await tick();
+    click($('.cm-confirm'));
+    if (method === 'abort') ac.abort();
+    else modal.close();
+    complete();
+    expect(await p).toMatchObject({ isDismissed: true });
+    expect(preConfirm).not.toHaveBeenCalled();
+  });
+
+  it('ignores a rejected validation after the next modal opens', async () => {
+    let fail!: (error: Error) => void;
+    const validation = new Promise<void>((_, reject) => { fail = reject; });
+    const first = modal.fire({ input: 'text', validate: () => validation });
+    await tick();
+    click($('.cm-confirm'));
+    modal.close();
+    await first;
+    const next = modal.prompt('Next');
+    await tick();
+    const input = $('input');
+    fail(new Error('Late failure'));
+    await tick();
+    expect(document.activeElement).toBe(input);
+    expect($('.cm-error').textContent).toBe('');
+    modal.close();
+    await next;
+  });
+
   it('validate blocks confirmation and shows an accessible error', async () => {
     const p = modal.fire({
       title: 'Email',
@@ -230,7 +264,7 @@ describe('inputs', () => {
   });
 
   it('select, radio, checkbox and textarea', async () => {
-    const s = modal.fire({ input: 'select', inputOptions: { tr: 'Türkiye', de: 'Deutschland' }, inputValue: 'de' });
+    const s = modal.fire({ input: 'select', inputOptions: { tr: 'Turkey', de: 'Germany' }, inputValue: 'de' });
     await tick();
     click($('.cm-confirm'));
     expect((await s).value).toBe('de');
@@ -266,13 +300,42 @@ describe('inputs', () => {
 });
 
 describe('createModal', () => {
-  it('layers defaults, and per-call options win', async () => {
-    const tr = createModal({ confirmText: 'Tamam', cancelText: 'Vazgeç', theme: 'dark' });
-    tr.confirm({ title: 'Emin misin?', confirmText: 'Evet' });
+  it('cleans up after onOpen throws and continues the queue', async () => {
+    const opener = document.createElement('button');
+    document.body.append(opener);
+    opener.focus();
+    const p = modal.fire({ onOpen: () => { throw new Error('Open failed'); } });
+    await expect(p).rejects.toThrow('Open failed');
+    expect(document.querySelector('dialog')).toBeNull();
+    expect(modal.isOpen()).toBe(false);
+    expect(document.documentElement.style.overflow).toBe('');
+    expect(document.activeElement).toBe(opener);
+    const next = modal.alert('Next');
     await tick();
-    expect($('.cm-confirm').textContent).toBe('Evet');
-    expect($('.cm-cancel').textContent).toBe('Vazgeç');
+    click($('.cm-confirm'));
+    await next;
+  });
+
+  it('rejects onClose errors after cleanup without blocking the queue', async () => {
+    const p = modal.fire({ onClose: () => { throw new Error('Close failed'); } });
+    const rejection = expect(p).rejects.toThrow('Close failed');
+    await tick();
+    click($('.cm-confirm'));
+    await rejection;
+    expect(document.querySelector('dialog')).toBeNull();
+    const next = modal.alert('Next');
+    await tick();
+    click($('.cm-confirm'));
+    await next;
+  });
+
+  it('layers defaults, and per-call options win', async () => {
+    const tr = createModal({ confirmText: 'Continue', cancelText: 'Dismiss', theme: 'dark' });
+    tr.confirm({ title: 'Are you sure?', confirmText: 'Yes' });
+    await tick();
+    expect($('.cm-confirm').textContent).toBe('Yes');
+    expect($('.cm-cancel').textContent).toBe('Dismiss');
     expect(dialog().classList.contains('cm-dark')).toBe(true);
-    expect(tr.create({ width: '20rem' }).defaults.confirmText).toBe('Tamam');
+    expect(tr.create({ width: '20rem' }).defaults.confirmText).toBe('Continue');
   });
 });

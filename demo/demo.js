@@ -3,114 +3,114 @@ const out = document.getElementById('out');
 const show = (label, value) => (out.textContent = `${label}: ${JSON.stringify(value, null, 2)}`);
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
-let m = ConfirmModal.create({ confirmText: 'Tamam', cancelText: 'Vazgeç', denyText: 'Hayır', theme: 'auto' });
+let m = ConfirmModal.create({ confirmText: 'OK', cancelText: 'Cancel', denyText: 'No', theme: 'auto' });
 document.getElementById('theme').addEventListener('change', (e) => {
   m = m.create({ theme: e.target.value });
 });
 
 const demos = {
-  alert: () => m.alert('Merhaba!', 'Bu, sade bir bilgilendirme penceresi.'),
-  success: () => m.success('Kaydedildi', 'Değişiklikleriniz başarıyla kaydedildi.'),
-  error: () => m.error('Bir şeyler ters gitti', 'Lütfen daha sonra tekrar deneyin.'),
-  confirm: () => m.confirm({ title: 'Devam edilsin mi?', text: 'Bu işlemi onaylıyor musunuz?', icon: 'question' }),
+  alert: () => m.alert('Hello!', 'A simple message to keep you informed.'),
+  success: () => m.success('Saved', 'Your changes have been saved.'),
+  error: () => m.error('Something went wrong', 'Please try again later.'),
+  confirm: () => m.confirm({ title: 'Continue?', text: 'Do you want to continue with this action?', icon: 'question' }),
   danger: () =>
     m.confirm({
-      title: 'Hesap silinsin mi?',
-      text: 'Bu işlem geri alınamaz. Varsayılan odak güvenli seçenekte (Vazgeç).',
+      title: 'Delete your account?',
+      text: 'This action cannot be undone. Cancel receives focus by default.',
       icon: 'warning',
       danger: true,
-      confirmText: 'Evet, sil',
+      confirmText: 'Yes, delete',
     }),
   deny: () =>
     m.fire({
-      title: 'Değişiklikler kaydedilsin mi?',
+      title: 'Save your changes?',
       icon: 'question',
       showDeny: true,
       showCancel: true,
-      confirmText: 'Kaydet',
-      denyText: 'Kaydetme',
+      confirmText: 'Save',
+      denyText: 'Discard',
     }),
-  prompt: () => m.prompt({ title: 'Adınız nedir?', inputPlaceholder: 'Ada Lovelace' }),
+  prompt: () => m.prompt({ title: 'What is your name?', inputPlaceholder: 'Ada Lovelace' }),
   email: () =>
     m.fire({
-      title: 'Bültene katılın',
+      title: 'Join the newsletter',
       input: 'email',
-      inputLabel: 'E-posta adresi',
-      inputPlaceholder: 'ornek@alan.com',
-      validate: (v) => (/^\S+@\S+\.\S+$/.test(v) ? null : 'Geçerli bir e-posta adresi girin.'),
+      inputLabel: 'Email address',
+      inputPlaceholder: 'hello@example.com',
+      validate: (v) => (/^\S+@\S+\.\S+$/.test(v) ? null : 'Enter a valid email address.'),
     }),
   select: () =>
     m.fire({
-      title: 'Şehir seçin',
+      title: 'Choose a city',
       input: 'select',
-      inputOptions: { ist: 'İstanbul', ank: 'Ankara', izm: 'İzmir' },
-      inputPlaceholder: 'Seçiniz…',
-      validate: (v) => (v ? null : 'Bir şehir seçmelisiniz.'),
+      inputOptions: { ist: 'Istanbul', ank: 'Ankara', izm: 'Izmir' },
+      inputPlaceholder: 'Choose an option…',
+      validate: (v) => (v ? null : 'Choose a city to continue.'),
       showCancel: true,
     }),
   radio: () =>
     m.fire({
       title: 'Plan',
       input: 'radio',
-      inputOptions: [['free', 'Ücretsiz'], ['pro', 'Pro'], ['team', 'Takım']],
+      inputOptions: [['free', 'Free'], ['pro', 'Pro'], ['team', 'Team']],
       inputValue: 'pro',
     }),
   checkbox: () =>
     m.fire({
-      title: 'Kullanım koşulları',
+      title: 'Terms of use',
       input: 'checkbox',
-      inputLabel: 'Koşulları okudum ve kabul ediyorum',
-      validate: (v) => (v ? null : 'Devam etmek için kabul etmelisiniz.'),
+      inputLabel: 'I have read and accept the terms',
+      validate: (v) => (v ? null : 'Accept the terms to continue.'),
     }),
-  textarea: () => m.fire({ title: 'Geri bildirim', input: 'textarea', inputPlaceholder: 'Düşünceleriniz…', showCancel: true }),
+  textarea: () => m.fire({ title: 'Feedback', input: 'textarea', inputPlaceholder: 'Share your thoughts…', showCancel: true }),
   preconfirm: () =>
     m.fire({
-      title: 'GitHub kullanıcısı',
+      title: 'GitHub username',
       input: 'text',
       inputValue: 'octocat',
       showCancel: true,
-      confirmText: 'Getir',
+      confirmText: 'Fetch',
       preConfirm: async (login) => {
         await wait(900);
-        if (login.toLowerCase() === 'hata') throw new Error('Sunucu yanıt vermedi, tekrar deneyin.');
+        if (login.toLowerCase() === 'error') throw new Error('The server did not respond. Please try again.');
         return { login, id: Math.floor(Math.random() * 1e6) };
       },
     }),
-  timer: () => m.fire({ title: 'Otomatik kapanacak', text: '3 saniye…', timer: 3000, timerProgressBar: true, showConfirm: false }),
+  timer: () => m.fire({ title: 'Closing automatically', text: '3 seconds…', timer: 3000, timerProgressBar: true, showConfirm: false }),
   html: () =>
     m.fire({
-      title: 'Güvenli HTML',
-      html: '<p>Bu içerik <strong>sanitize</strong> edildi. <a href="https://developer.mozilla.org" target="_blank">MDN</a> bağlantısı güvenle açılır.</p><ul><li>Liste</li><li>öğeleri</li></ul>',
+      title: 'Sanitized HTML',
+      html: '<p>This content is <strong>sanitized</strong>. Learn more on <a href="https://developer.mozilla.org" target="_blank">MDN</a>.</p><ul><li>Formatted content</li><li>Readable structure</li></ul>',
     }),
   xss: () =>
     m.fire({
       title: '<img src=x onerror=alert("XSS")>',
       icon: 'warning',
-      html: 'Zararlı kod: <img src=x onerror="alert(1)"><a href="javascript:alert(1)">tıkla</a><script>alert(1)<\/script> — hiçbiri çalışmaz.',
+      html: 'Untrusted HTML: <img src=x onerror="alert(1)"><a href="javascript:alert(1)">click</a><script>alert(1)<\/script> — scripts and event handlers are removed.',
     }),
   queue: async () => {
-    const a = m.alert('1 / 3', 'Modaller üst üste binmez, sırayla açılır.');
+    const a = m.alert('1 / 3', 'Dialogs open one at a time in the order they are requested.');
     const b = m.alert('2 / 3');
     const c = m.alert('3 / 3');
     await Promise.all([a, b, c]);
-    return 'sıra bitti';
+    return 'queue complete';
   },
   abort: () => {
     const ac = new AbortController();
     setTimeout(() => ac.abort(), 2000);
-    return m.fire({ title: 'Dışarıdan kapatılacak', text: 'AbortController 2 saniye sonra iptal ediyor.', signal: ac.signal });
+    return m.fire({ title: 'Dismissed externally', text: 'AbortController will dismiss this dialog after 2 seconds.', signal: ac.signal });
   },
-  toast: () => (m.toast({ title: 'Kaydedildi', text: 'Taslak otomatik kaydedildi.', icon: 'success' }), 'toast'),
+  toast: () => (m.toast({ title: 'Saved', text: 'Your draft was saved automatically.', icon: 'success' }), 'toast'),
   'toast-error': () =>
     (m.toast({
-      title: 'Yükleme başarısız',
-      text: 'Bağlantı koptu.',
+      title: 'Upload failed',
+      text: 'The connection was lost.',
       icon: 'error',
       timer: 8000,
-      action: { text: 'Tekrar dene', onClick: () => m.toast({ title: 'Tekrar deneniyor…', icon: 'info' }) },
+      action: { text: 'Retry', onClick: () => m.toast({ title: 'Retrying…', icon: 'info' }) },
     }),
     'toast'),
-  'toast-bottom': () => (m.toast({ title: 'Panoya kopyalandı', position: 'bottom', timer: 2500 }), 'toast'),
+  'toast-bottom': () => (m.toast({ title: 'Copied to clipboard', position: 'bottom', timer: 2500 }), 'toast'),
 };
 
 document.addEventListener('click', async (e) => {
@@ -122,8 +122,8 @@ document.addEventListener('click', async (e) => {
 
 // Declarative confirmations
 m.bind();
-document.getElementById('declarative-delete').addEventListener('click', () => m.toast({ title: 'Silindi', icon: 'success' }));
+document.getElementById('declarative-delete').addEventListener('click', () => m.toast({ title: 'Deleted', icon: 'success' }));
 document.getElementById('declarative-form').addEventListener('submit', (e) => {
   e.preventDefault();
-  m.toast({ title: 'Form gönderildi', icon: 'success' });
+  m.toast({ title: 'Form submitted', icon: 'success' });
 });

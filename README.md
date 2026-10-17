@@ -2,143 +2,188 @@
 
 [![CI](https://github.com/onurdevs/confirm-modal/actions/workflows/ci.yml/badge.svg)](https://github.com/onurdevs/confirm-modal/actions/workflows/ci.yml) [![npm](https://img.shields.io/npm/v/@onurdev/confirm-modal)](https://www.npmjs.com/package/@onurdev/confirm-modal)
 
-SweetAlert tarzı, Promise tabanlı modal, onay, prompt ve toast kütüphanesi. Daha modern, daha hafif, varsayılan olarak güvenli.
+Modern dialogs. Clear decisions. Effortless feedback.
 
-- **Modern:** native `<dialog>` + `showModal()` (top layer, `inert` arka plan), toastlar için Popover API, CSS değişkenleriyle tema, otomatik koyu mod, `prefers-reduced-motion` desteği.
-- **Hızlı ve küçük:** sıfır bağımlılık, CSS dahil ~8 kB gzip (SweetAlert2 ~16 kB). SSR'da import etmek güvenli (import anında `window`'a dokunmaz).
-- **Güvenli:** `title` / `text` her zaman `textContent` ile yazılır. `html` string'leri inert bir belgede ayrıştırılıp allowlist ile yeniden kurulur: `<script>`, `on*` öznitelikleri, `javascript:` / `data:` linkleri, `<svg>`, `<iframe>`, DOM clobbering id'leri atılır. Sıkı CSP (`script-src 'self'; style-src 'self'`) ve Trusted Types ile çalışır.
-- **Erişilebilir:** doğru `role` / `aria-labelledby` / `aria-describedby`, ESC ile kapanma, açanda odağı geri verme, hata mesajları `aria-live` ile okunur, tehlikeli işlemlerde varsayılan odak "Vazgeç" butonunda.
-- **Kolay entegre:** ESM, CJS ve `<script>` build'i, tam TypeScript tipleri, `AbortSignal` ile dışarıdan kapatma, `data-cm-confirm` ile JS yazmadan onay.
+Confirm Modal brings Promise-based dialogs, confirmations, prompts, and toast notifications to the modern web. Built on native browser primitives, it combines a small footprint with thoughtful interaction defaults and a fully typed API. Zero runtime dependencies.
 
-## Kurulum
+[View on npm](https://www.npmjs.com/package/@onurdev/confirm-modal) · [Source on GitHub](https://github.com/onurdevs/confirm-modal)
+
+- **Native foundation.** Uses `<dialog>` and `showModal()` for modal interactions, with the Popover API for toast placement where available.
+- **Compact by design.** Approximately 8 kB gzipped for the browser bundle, including its embedded styles. Safe to import during server rendering.
+- **Safer content defaults.** Titles and text render as plain text. HTML strings pass through an allowlist sanitizer that removes scripts, event handlers, unsafe link schemes, and unsupported elements.
+- **Accessible interactions.** Dialog labels, focus restoration, live validation messages, reduced motion support, and cancel-first focus for destructive confirmations.
+- **Your visual language.** CSS custom properties, light and dark themes, and automatic system theme detection.
+- **Fits your stack.** ESM, CommonJS, and browser builds; TypeScript definitions; asynchronous validation; `AbortSignal`; and declarative confirmations.
+
+## Installation
 
 ```bash
-npm i @onurdev/confirm-modal
+npm install @onurdev/confirm-modal
 ```
 
 ```js
 import modal from '@onurdev/confirm-modal';
 ```
 
-veya doğrudan sayfaya:
+For a browser script:
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/@onurdev/confirm-modal"></script>
-<script>ConfirmModal.alert('Merhaba');</script>
+<script>ConfirmModal.alert('Hello');</script>
 ```
 
-Stiller otomatik eklenir (constructable stylesheet, CSP'ye takılmaz). Kendi CSS'inizi yüklemek isterseniz `createModal({ injectStyles: false })` deyip `@onurdev/confirm-modal/style.css` dosyasını import edin.
-
-## Kullanım
+Styles are injected automatically using a constructable stylesheet where supported. To load CSS yourself:
 
 ```js
-// Basit
-await modal.alert('Kaydedildi');
-await modal.success('Tamam', 'Değişiklikler kaydedildi.');
+import { createModal } from '@onurdev/confirm-modal';
+import '@onurdev/confirm-modal/style.css';
 
-// Onay → boolean
-if (await modal.confirm({ title: 'Silinsin mi?', text: 'Geri alınamaz.', danger: true, confirmText: 'Sil' })) {
+const modal = createModal({ injectStyles: false });
+```
+
+## Usage
+
+```js
+await modal.alert('Saved');
+await modal.success('All set', 'Your changes have been saved.');
+
+// Confirmations resolve to a boolean.
+if (await modal.confirm({
+  title: 'Delete this item?',
+  text: 'This action cannot be undone.',
+  danger: true,
+  confirmText: 'Delete',
+})) {
   await api.delete(id);
 }
 
-// Prompt → string | null
-const name = await modal.prompt('Adınız?', 'Ada');
+// Prompts resolve to a string, or null when dismissed.
+const name = await modal.prompt('What is your name?', 'Ada');
 
-// Tam kontrol
-const r = await modal.fire({
-  title: 'Bültene katılın',
+// Validate input and run asynchronous work before closing.
+const result = await modal.fire({
+  title: 'Join the newsletter',
   input: 'email',
-  inputLabel: 'E-posta',
-  validate: (v) => (v.includes('@') ? null : 'Geçerli bir e-posta girin'),
-  preConfirm: async (email) => api.subscribe(email), // buton loading olur; hata fırlatırsa modal açık kalır
+  inputLabel: 'Email address',
+  validate: (value) => (String(value).includes('@') ? null : 'Enter a valid email address.'),
+  preConfirm: async (email) => api.subscribe(email),
   showCancel: true,
 });
-if (r.isConfirmed) console.log(r.value);
-// r: { isConfirmed, isDenied, isDismissed, value?, dismiss?: 'cancel'|'backdrop'|'esc'|'close'|'timer'|'abort'|'programmatic' }
+if (result.isConfirmed) console.log(result.value);
 
-// Toast (bloklamaz)
-modal.toast({ title: 'Kopyalandı', icon: 'success', position: 'bottom' });
-modal.toast({ title: 'Yükleme başarısız', icon: 'error', action: { text: 'Tekrar dene', onClick: retry } });
+// Toasts provide feedback without opening a modal.
+modal.toast({ title: 'Copied', icon: 'success', position: 'bottom' });
+modal.toast({
+  title: 'Upload failed',
+  icon: 'error',
+  action: { text: 'Retry', onClick: retry },
+});
 ```
 
-### Varsayılanlar ve dil
+`fire()` returns `{ isConfirmed, isDenied, isDismissed, value?, dismiss? }`. Dismissal reasons are `cancel`, `backdrop`, `esc`, `close`, `timer`, `abort`, and `programmatic`.
+
+### Defaults and customization
 
 ```js
 import { createModal } from '@onurdev/confirm-modal';
 
 export const modal = createModal({
-  confirmText: 'Tamam',
-  cancelText: 'Vazgeç',
-  denyText: 'Hayır',
-  theme: 'auto',          // 'light' | 'dark' | 'auto'
+  confirmText: 'Continue',
+  cancelText: 'Cancel',
+  denyText: 'No',
+  theme: 'auto', // 'light' | 'dark' | 'auto'
   toast: { position: 'bottom-end' },
 });
 
-const dangerModal = modal.create({ danger: true, icon: 'warning' }); // üst üste katmanlanır
+// Derive an instance with additional defaults.
+const dangerModal = modal.create({ danger: true, icon: 'warning' });
 ```
 
-### JS yazmadan onay
+### Declarative confirmations
+
+Register once, then add confirmation attributes to links, buttons, or forms:
 
 ```js
-modal.bind(); // bir kere çağırın
+const unbind = modal.bind();
+// Call unbind() to remove the event listeners.
 ```
 
 ```html
-<a href="/logout" data-cm-confirm="Çıkış yapılsın mı?">Çıkış</a>
-<button data-cm-confirm="Kalıcı olarak silinecek." data-cm-title="Silinsin mi?" data-cm-danger data-cm-confirm-text="Sil">Sil</button>
-<form data-cm-confirm="Form gönderilsin mi?">…</form>
+<a href="/logout" data-cm-confirm="Sign out?">Sign out</a>
+<button data-cm-confirm="This item will be permanently deleted." data-cm-title="Delete this item?" data-cm-danger data-cm-confirm-text="Delete">Delete</button>
+<form data-cm-confirm="Submit this form?">…</form>
 ```
 
-### Framework'lerle
+### Framework integration
 
-Çekirdek framework'ten bağımsız; her yerde aynı şekilde çağrılır:
+Call the same API from your framework's event handlers:
 
 ```tsx
 // React
-<button onClick={async () => (await modal.confirm('Emin misiniz?')) && remove()}>Sil</button>
-
-// Vue
-<button @click="async () => (await modal.confirm('Emin misiniz?')) && remove()">Sil</button>
+<button onClick={async () => (await modal.confirm('Are you sure?')) && remove()}>Delete</button>
 ```
 
-Component unmount olduğunda açık modalı kapatmak için `signal` verin:
+```html
+<!-- Vue -->
+<button @click="async () => (await modal.confirm('Are you sure?')) && remove()">Delete</button>
+```
+
+Pass an `AbortSignal` to dismiss a dialog when its component unmounts:
 
 ```js
-const ac = new AbortController();
-modal.fire({ title: '…', signal: ac.signal });
-// cleanup: ac.abort();
+const controller = new AbortController();
+modal.fire({ title: 'Edit your details', signal: controller.signal });
+// In your cleanup handler: controller.abort();
 ```
 
-## Seçenekler
+## Options
 
-| Seçenek | Açıklama |
+| Option | Description |
 | --- | --- |
-| `title`, `text` | Düz metin (HTML olarak yorumlanmaz). |
-| `html` | String ise sanitize edilir; `Node` verirseniz olduğu gibi eklenir. |
-| `sanitizer` | Kendi sanitizer'ınız (ör. `DOMPurify.sanitize`). Çıktısı yine de inert biçimde ayrıştırılır. |
+| `title`, `text` | Plain text; never interpreted as HTML. |
+| `html` | Sanitized when passed as a string. DOM nodes are inserted as provided. |
+| `sanitizer` | Replace the built-in sanitizer with your own. String output is parsed before insertion. |
 | `icon` | `success`, `error`, `warning`, `info`, `question` |
-| `confirmText`, `cancelText`, `denyText` | Buton metinleri |
-| `showConfirm`, `showCancel`, `showDeny`, `showCloseButton` | Görünen butonlar |
-| `danger` | Onay butonunu kırmızı yapar, varsayılan odağı "Vazgeç"e taşır. |
+| `confirmText`, `cancelText`, `denyText` | Button labels. |
+| `showConfirm`, `showCancel`, `showDeny`, `showCloseButton` | Control button visibility. |
+| `danger` | Apply destructive button styling and prefer Cancel for initial focus when no input is present. |
 | `focus` | `confirm`, `cancel`, `deny`, `input`, `none` |
-| `reverseButtons` | Buton sırasını ters çevirir |
+| `reverseButtons` | Reverse the visual button order. |
 | `input` | `text`, `email`, `password`, `number`, `tel`, `url`, `textarea`, `select`, `radio`, `checkbox` |
-| `inputValue`, `inputPlaceholder`, `inputLabel`, `inputOptions`, `inputAttributes` | Girdi ayarları (`on*` öznitelikleri her zaman reddedilir) |
-| `validate(value)` | Hata mesajı döndürürse onay engellenir. Async olabilir. |
-| `preConfirm(value)` | Onaydan sonra loading durumunda çalışır; dönen değer `result.value` olur. Hata fırlatır veya `false` dönerse modal açık kalır. |
-| `timer`, `timerProgressBar` | Otomatik kapanma |
-| `closeOnEsc`, `closeOnBackdrop` | Varsayılan `true` |
+| `inputValue`, `inputPlaceholder`, `inputLabel`, `inputOptions`, `inputAttributes` | Input configuration. Event handler attributes (`on*`) are rejected. |
+| `validate(value)` | Return an error message to block confirmation. Supports async functions. |
+| `preConfirm(value)` | Run work while the confirm button shows a loading state. Return a value for `result.value`, return `false` to stay open, or throw to display an error. |
+| `timer`, `timerProgressBar` | Automatic dismissal and an optional progress bar. |
+| `closeOnEsc`, `closeOnBackdrop` | Both default to `true`. |
 | `position` | `center`, `top`, `bottom` |
-| `theme`, `width`, `className` | Görünüm |
-| `signal` | `AbortSignal` ile dışarıdan kapatma |
-| `target` | Modalın ekleneceği element (varsayılan `document.body`) |
-| `onOpen(dialog)`, `onClose(result)` | Yaşam döngüsü |
+| `theme`, `width`, `className` | Appearance settings. |
+| `signal` | Dismiss externally with an `AbortSignal`. |
+| `target` | Mount element; defaults to `document.body`. |
+| `onOpen(dialog)`, `onClose(result)` | Lifecycle callbacks. |
 
-Modallar üst üste binmez, sıraya girer. `modal.close()` açık olanı kapatır, `modal.isOpen()` durumu verir.
+Dialogs share a queue and open one at a time. `modal.close()` dismisses the current dialog; `modal.isOpen()` reports its state.
 
-## Tema
+If `onOpen` or `onClose` throws, the dialog is cleaned up and the call's Promise rejects. Toast `onClose` errors reject `handle.closed`. Closing a dialog during pending validation prevents `preConfirm` from starting. Work that has already started inside `preConfirm` needs its own cancellation mechanism.
 
-Tüm renkler, köşe yarıçapları ve süreler `--cm-*` değişkenleridir:
+### Toast options
+
+Toasts accept `title`, `text`, `html`, `icon`, `theme`, `className`, and `sanitizer`, plus:
+
+| Option | Description |
+| --- | --- |
+| `position` | `top`, `top-start`, `top-end`, `bottom`, `bottom-start`, `bottom-end`; defaults to `top-end`. |
+| `timer` | Dismiss after this many milliseconds; defaults to `4000`. Use `0` to keep it open. |
+| `timerProgressBar` | Show the timer progress bar; defaults to `true`. |
+| `pauseOnHover` | Pause the timer while hovered or focused; defaults to `true`. |
+| `showCloseButton` | Show a dismiss button; defaults to `true`. |
+| `action` | `{ text, onClick }` for an optional action button. |
+| `onClose()` | Called after the toast is removed. |
+
+`toast()` returns a handle with `close()`, `closed`, and `element`. Await `closed` to wait for removal.
+
+## Themes
+
+Customize colors, corner radii, and animation timing with `--cm-*` properties:
 
 ```css
 .cm-root, .cm-toasts {
@@ -148,27 +193,38 @@ Tüm renkler, köşe yarıçapları ve süreler `--cm-*` değişkenleridir:
 }
 ```
 
-Seçiciler tek sınıf düzeyinde tutuldu: sayfanızdaki `button {}` / `h2 {}` gibi kurallar modala sızmaz, sizin `.cm-*` kurallarınız ise kolayca üstüne yazar.
+Component classes define the core presentation. Use `.cm-*` rules to customize individual elements.
 
-## CSP
+## Content security
 
-Kütüphane inline script, `eval` veya `innerHTML` kullanmaz. Stiller constructable stylesheet ile eklenir; bunu desteklemeyen eski tarayıcılarda `<style>` etiketine `createModal({ styleNonce })` ile nonce verebilirsiniz. Trusted Types zorunluysa politikaya `confirm-modal` adını ekleyin:
+The library does not use inline scripts, `eval`, or `innerHTML`. It uses constructable stylesheets where available. For the `<style>` fallback, provide a nonce with `createModal({ styleNonce })`, or load the exported CSS and disable style injection.
 
-```
+If your policy requires Trusted Types, allow the `confirm-modal` policy:
+
+```text
 Content-Security-Policy: script-src 'self'; style-src 'self'; require-trusted-types-for 'script'; trusted-types confirm-modal
 ```
 
-## Geliştirme
+The built-in sanitizer processes HTML strings. DOM nodes and custom sanitizer output are trusted inputs; you are responsible for their safety.
+
+## Development
 
 ```bash
 npm install
-npm test          # vitest + happy-dom, 47 test
-npm run build     # dist/: ESM, CJS, <script> build, CSS, .d.ts
-npx serve .       # sonra /demo/ adresini açın
+npm test          # 55 tests across browser-like and server environments
+npm run typecheck
+npm run build     # ESM, CommonJS, browser bundle, CSS, and type declarations
+npx serve .       # Open /demo/ to explore the examples
 ```
 
-## Yayınlama
+## Publishing
 
-`npm version patch` (veya `minor` / `major`) ve ardından `git push --follow-tags`. `v*` etiketi GitHub Actions'taki yayın akışını tetikler; testler geçerse paket provenance ile npm'e gönderilir.
+Run `npm version patch` (or `minor` / `major`), then `git push --follow-tags`. A `v*` tag triggers the GitHub Actions publishing workflow, which runs tests and builds before publishing to npm with provenance.
 
-Tarayıcı desteği: `<dialog>` olan tüm güncel tarayıcılar (Chrome/Edge 37+, Firefox 98+, Safari 15.4+).
+## Browser support
+
+Modal interactions require native `<dialog>` support. Toasts use the Popover API when available and fall back to a positioned container otherwise. Test in your target browsers when using strict content security policies or custom styling.
+
+## License
+
+MIT

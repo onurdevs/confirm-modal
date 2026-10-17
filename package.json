@@ -1,7 +1,7 @@
 {
   "name": "@onurdev/confirm-modal",
-  "version": "0.1.0",
-  "description": "Modern, fast, secure and accessible Promise-based modal, confirm, prompt and toast library. Zero dependencies.",
+  "version": "0.1.1",
+  "description": "Modern dialogs, confirmations, prompts, and toast notifications built on native browser APIs. Promise-based, accessible, fully typed, and dependency-free.",
   "license": "MIT",
   "type": "module",
   "sideEffects": false,
@@ -29,9 +29,12 @@
     "alert",
     "prompt",
     "toast",
-    "sweetalert",
     "accessible",
-    "a11y"
+    "a11y",
+    "native-dialog",
+    "popover",
+    "typescript",
+    "zero-dependencies"
   ],
   "scripts": {
     "build": "node build.mjs && tsc -p tsconfig.build.json",

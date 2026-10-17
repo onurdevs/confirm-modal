@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import modal from '../src/index';
+import modal, { createModal } from '../src/index';
 import { $, click, tick } from './helpers';
 
 afterEach(async () => {
@@ -11,6 +11,14 @@ afterEach(async () => {
 });
 
 describe('toast', () => {
+  it('settles closed with an error when onClose throws', async () => {
+    const t = modal.toast({ timer: 0, onClose: () => { throw new Error('Close failed'); } });
+    const rejection = expect(t.closed).rejects.toThrow('Close failed');
+    t.close();
+    await rejection;
+    expect(t.element.isConnected).toBe(false);
+  });
+
   it('shows a live-region toast and auto closes', async () => {
     const onClose = vi.fn();
     const t = modal.toast({ title: 'Saved', text: '<i>safe</i>', icon: 'success', timer: 40, onClose });
@@ -48,6 +56,32 @@ describe('toast', () => {
 });
 
 describe('bind (data-cm-confirm)', () => {
+  it('preserves default button labels and allows attribute overrides', async () => {
+    const api = createModal({ confirmText: 'Continue', cancelText: 'Dismiss' });
+    const b = document.createElement('button');
+    b.dataset.cmConfirm = 'Delete?';
+    document.body.append(b);
+    const unbind = api.bind();
+    try {
+      click(b);
+      await tick();
+      expect($('.cm-confirm').textContent).toBe('Continue');
+      expect($('.cm-cancel').textContent).toBe('Dismiss');
+      api.close();
+      await tick(450);
+      b.dataset.cmConfirmText = 'Delete';
+      b.dataset.cmCancelText = 'Cancel';
+      click(b);
+      await tick();
+      expect($('.cm-confirm').textContent).toBe('Delete');
+      expect($('.cm-cancel').textContent).toBe('Cancel');
+      api.close();
+      await tick(450);
+    } finally {
+      unbind();
+    }
+  });
+
   it('asks before letting a click through', async () => {
     document.body.innerHTML = '<button id="b" data-cm-confirm="Delete?" data-cm-danger>Delete</button>';
     const handler = vi.fn();

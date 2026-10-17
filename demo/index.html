@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="tr">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -14,49 +14,49 @@
 <body>
   <header>
     <h1>Confirm Modal</h1>
-    <p>SweetAlert tarzı, ama modern: native <code>&lt;dialog&gt;</code>, sıfır bağımlılık, ~8 kB gzip, XSS'e kapalı, sıkı CSP ile çalışır.</p>
-    <label class="theme">Tema
+    <p>Modern dialogs, clear decisions, and effortless feedback. Native <code>&lt;dialog&gt;</code>, zero runtime dependencies, and a fully typed API.</p>
+    <label class="theme">Theme
       <select id="theme">
-        <option value="auto">Sistem</option>
-        <option value="light">Açık</option>
-        <option value="dark">Koyu</option>
+        <option value="auto">System</option>
+        <option value="light">Light</option>
+        <option value="dark">Dark</option>
       </select>
     </label>
   </header>
 
   <main>
     <section>
-      <h2>Temel</h2>
+      <h2>Basics</h2>
       <div class="grid">
         <button data-demo="alert">Alert</button>
-        <button data-demo="success">Başarılı</button>
-        <button data-demo="error">Hata</button>
-        <button data-demo="confirm">Onay</button>
-        <button data-demo="danger">Tehlikeli işlem</button>
-        <button data-demo="deny">Kaydet / Kaydetme / Vazgeç</button>
+        <button data-demo="success">Success</button>
+        <button data-demo="error">Error</button>
+        <button data-demo="confirm">Confirm</button>
+        <button data-demo="danger">Destructive action</button>
+        <button data-demo="deny">Save / Discard / Cancel</button>
       </div>
     </section>
 
     <section>
-      <h2>Girdi</h2>
+      <h2>Inputs</h2>
       <div class="grid">
         <button data-demo="prompt">Prompt</button>
-        <button data-demo="email">E-posta + doğrulama</button>
-        <button data-demo="select">Seçim listesi</button>
-        <button data-demo="radio">Radyo</button>
-        <button data-demo="checkbox">Onay kutusu</button>
-        <button data-demo="textarea">Uzun metin</button>
+        <button data-demo="email">Email + validation</button>
+        <button data-demo="select">Select</button>
+        <button data-demo="radio">Radio</button>
+        <button data-demo="checkbox">Checkbox</button>
+        <button data-demo="textarea">Textarea</button>
       </div>
     </section>
 
     <section>
-      <h2>Gelişmiş</h2>
+      <h2>Advanced</h2>
       <div class="grid">
-        <button data-demo="preconfirm">Async işlem (preConfirm)</button>
-        <button data-demo="timer">Zamanlayıcı</button>
-        <button data-demo="html">Güvenli HTML</button>
-        <button data-demo="xss">XSS denemesi</button>
-        <button data-demo="queue">Kuyruk (3 modal)</button>
+        <button data-demo="preconfirm">Async action (preConfirm)</button>
+        <button data-demo="timer">Timer</button>
+        <button data-demo="html">Sanitized HTML</button>
+        <button data-demo="xss">HTML sanitization</button>
+        <button data-demo="queue">Queue (3 dialogs)</button>
         <button data-demo="abort">AbortSignal</button>
       </div>
     </section>
@@ -64,27 +64,27 @@
     <section>
       <h2>Toast</h2>
       <div class="grid">
-        <button data-demo="toast">Bildirim</button>
-        <button data-demo="toast-error">Hata bildirimi + aksiyon</button>
-        <button data-demo="toast-bottom">Alt orta</button>
+        <button data-demo="toast">Notification</button>
+        <button data-demo="toast-error">Error toast + action</button>
+        <button data-demo="toast-bottom">Bottom center</button>
       </div>
     </section>
 
     <section>
-      <h2>Deklaratif (JS yazmadan)</h2>
-      <p>Bu öğelerde sadece <code>data-cm-confirm</code> var:</p>
+      <h2>Declarative confirmations</h2>
+      <p>These elements use <code>data-cm-confirm</code> attributes:</p>
       <div class="grid">
-        <a href="#cikis-yapildi" data-cm-confirm="Çıkış yapmak istiyor musunuz?">Çıkış yap (link)</a>
-        <button id="declarative-delete" data-cm-confirm="Bu kayıt kalıcı olarak silinecek." data-cm-title="Silinsin mi?" data-cm-confirm-text="Sil" data-cm-danger>Sil (buton)</button>
+        <a href="#signed-out" data-cm-confirm="Do you want to sign out?">Sign out (link)</a>
+        <button id="declarative-delete" data-cm-confirm="This item will be permanently deleted." data-cm-title="Delete this item?" data-cm-confirm-text="Delete" data-cm-danger>Delete (button)</button>
       </div>
-      <form id="declarative-form" data-cm-confirm="Form gönderilsin mi?">
-        <input name="ad" placeholder="Adınız" aria-label="Adınız">
-        <button>Gönder (form)</button>
+      <form id="declarative-form" data-cm-confirm="Submit this form?">
+        <input name="name" placeholder="Your name" aria-label="Your name">
+        <button>Submit (form)</button>
       </form>
     </section>
 
     <section>
-      <h2>Son sonuç</h2>
+      <h2>Latest result</h2>
       <pre id="out" aria-live="polite">—</pre>
     </section>
   </main>

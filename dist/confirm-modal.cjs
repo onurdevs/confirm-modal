@@ -253,7 +253,9 @@ function openToast(o, nonce, inject = !0) {
     let x = h("button", { type: "button", class: "cm-close", "aria-label": "Dismiss" }, "\xD7");
     x.addEventListener("click", () => close()), el.append(x);
   }
-  let duration = o.timer ?? 4e3, timer, remaining = duration, startedAt = 0, closing = !1, resolveClosed, closed = new Promise((r) => resolveClosed = r), start = () => {
+  let duration = o.timer ?? 4e3, timer, remaining = duration, startedAt = 0, closing = !1, resolveClosed, rejectClosed, closed = new Promise((resolve, reject) => {
+    resolveClosed = resolve, rejectClosed = reject;
+  }), start = () => {
     !duration || closing || (startedAt = Date.now(), timer = setTimeout(close, remaining));
   }, pause = () => {
     !duration || timer === void 0 || (clearTimeout(timer), timer = void 0, remaining -= Date.now() - startedAt, el.classList.add("cm-paused"));
@@ -267,7 +269,13 @@ function openToast(o, nonce, inject = !0) {
           box.matches(":popover-open") && box.hidePopover();
         } catch {
         }
-      o.onClose?.(), resolveClosed();
+      try {
+        o.onClose?.();
+      } catch (error) {
+        rejectClosed(error);
+        return;
+      }
+      resolveClosed();
     }
   }
   if (duration && o.timerProgressBar !== !1) {
@@ -312,7 +320,7 @@ function setAttrs(el, attrs) {
       /^on/i.test(k) || el.setAttribute(k, v);
 }
 function render(o, nonce, inject = !0) {
-  return o.signal?.aborted ? Promise.resolve(dismissed("abort")) : (inject && injectStyles(nonce), new Promise((resolve) => {
+  return o.signal?.aborted ? Promise.resolve(dismissed("abort")) : (inject && injectStyles(nonce), new Promise((resolve, reject) => {
     let titleId = nextId("title"), contentId = nextId("content"), errorId = nextId("error"), hasInput = !!o.input, dialog = h("dialog", {
       class: ["cm-root", themeClass(o.theme), o.position && o.position !== "center" && `cm-${o.position}`, o.className].filter(Boolean).join(" "),
       role: hasInput ? void 0 : "alertdialog",
@@ -375,14 +383,16 @@ function render(o, nonce, inject = !0) {
       let bar = h("div", { class: "cm-progress", "aria-hidden": "true" });
       bar.style.setProperty("--cm-timer", `${o.timer}ms`), dialog.append(bar), requestAnimationFrame(() => bar.classList.add("cm-running"));
     }
-    let opener = document.activeElement, root = document.documentElement, prevOverflow = root.style.overflow, settled = !1, busy = !1, finish = async (result) => {
+    let opener = document.activeElement, root = document.documentElement, prevOverflow = root.style.overflow, settled = !1, busy = !1, finish = async (result, failure) => {
       if (!settled) {
         settled = !0, clearTimeout(timer), o.signal?.removeEventListener("abort", onAbort), current?.dialog === dialog && (current = null), await animateOut(dialog), dialog.open && dialog.close(), dialog.remove(), root.style.overflow = prevOverflow, opener && opener.isConnected && typeof opener.focus == "function" && opener.focus({ preventScroll: !0 });
         try {
           o.onClose?.(result);
-        } finally {
-          resolve(result);
+        } catch (error2) {
+          reject(error2);
+          return;
         }
+        failure ? reject(failure.error) : resolve(result);
       }
     }, dismiss = (reason) => {
       busy && reason !== "abort" && reason !== "programmatic" || finish(dismissed(reason));
@@ -399,11 +409,13 @@ function render(o, nonce, inject = !0) {
       try {
         if (o.validate) {
           let msg = await o.validate(raw);
+          if (settled) return;
           if (msg)
             return setBusy(!1), showError(msg);
         }
         if (o.preConfirm) {
           let out = await o.preConfirm(value);
+          if (settled) return;
           if (out === !1) {
             setBusy(!1);
             return;
@@ -411,7 +423,7 @@ function render(o, nonce, inject = !0) {
           out !== void 0 && (value = out);
         }
       } catch (e) {
-        return setBusy(!1), showError(e instanceof Error ? e.message : String(e));
+        return settled ? void 0 : (setBusy(!1), showError(e instanceof Error ? e.message : String(e)));
       }
       busy = !1, finish({ isConfirmed: !0, isDenied: !1, isDismissed: !1, value });
     };
@@ -442,22 +454,28 @@ function render(o, nonce, inject = !0) {
       // Destructive actions default to the safe choice.
       focusTarget ?? (o.danger && cancelBtn ? cancelBtn : confirmBtn ?? cancelBtn)
     );
-    pick ? (pick.focus(), pick instanceof HTMLInputElement && TEXT_INPUTS.has(o.input) && pick.select?.()) : dialog.focus(), o.onOpen?.(dialog);
+    pick ? (pick.focus(), pick instanceof HTMLInputElement && TEXT_INPUTS.has(o.input) && pick.select?.()) : dialog.focus();
+    try {
+      o.onOpen?.(dialog);
+    } catch (error2) {
+      finish(dismissed("programmatic"), { error: error2 });
+    }
   }));
 }
 
 // src/bind.ts
 var SELECTOR = "[data-cm-confirm]";
-function bindConfirm(api, root = document) {
+function bindConfirm(api, root) {
   if (!isBrowser) return () => {
   };
+  root ?? (root = document);
   let approved = /* @__PURE__ */ new WeakSet(), ask = (el) => {
     let d = el.dataset, message = d.cmConfirm || "";
     return api.confirm({
       title: d.cmTitle || message,
       text: d.cmTitle ? message : void 0,
-      confirmText: d.cmConfirmText,
-      cancelText: d.cmCancelText,
+      ...d.cmConfirmText !== void 0 ? { confirmText: d.cmConfirmText } : {},
+      ...d.cmCancelText !== void 0 ? { cancelText: d.cmCancelText } : {},
       danger: "cmDanger" in d,
       icon: d.cmIcon || ("cmDanger" in d ? "warning" : void 0)
     });
