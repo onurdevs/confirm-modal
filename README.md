@@ -1,6 +1,6 @@
 # Confirm Modal
 
-[![CI](https://github.com/onurdevs/confirm-modal/actions/workflows/ci.yml/badge.svg)](https://github.com/onurdevs/confirm-modal/actions/workflows/ci.yml) [![npm](https://img.shields.io/npm/v/@onurdevs/confirm-modal)](https://www.npmjs.com/package/@onurdevs/confirm-modal)
+[![CI](https://github.com/onurdevs/confirm-modal/actions/workflows/ci.yml/badge.svg)](https://github.com/onurdevs/confirm-modal/actions/workflows/ci.yml) [![npm](https://img.shields.io/npm/v/@onurdev/confirm-modal)](https://www.npmjs.com/package/@onurdev/confirm-modal)
 
 SweetAlert tarzı, Promise tabanlı modal, onay, prompt ve toast kütüphanesi. Daha modern, daha hafif, varsayılan olarak güvenli.
 
@@ -13,21 +13,21 @@ SweetAlert tarzı, Promise tabanlı modal, onay, prompt ve toast kütüphanesi. 
 ## Kurulum
 
 ```bash
-npm i @onurdevs/confirm-modal
+npm i @onurdev/confirm-modal
 ```
 
 ```js
-import modal from '@onurdevs/confirm-modal';
+import modal from '@onurdev/confirm-modal';
 ```
 
 veya doğrudan sayfaya:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@onurdevs/confirm-modal"></script>
+<script src="https://cdn.jsdelivr.net/npm/@onurdev/confirm-modal"></script>
 <script>ConfirmModal.alert('Merhaba');</script>
 ```
 
-Stiller otomatik eklenir (constructable stylesheet, CSP'ye takılmaz). Kendi CSS'inizi yüklemek isterseniz `createModal({ injectStyles: false })` deyip `@onurdevs/confirm-modal/style.css` dosyasını import edin.
+Stiller otomatik eklenir (constructable stylesheet, CSP'ye takılmaz). Kendi CSS'inizi yüklemek isterseniz `createModal({ injectStyles: false })` deyip `@onurdev/confirm-modal/style.css` dosyasını import edin.
 
 ## Kullanım
 
@@ -64,7 +64,7 @@ modal.toast({ title: 'Yükleme başarısız', icon: 'error', action: { text: 'Te
 ### Varsayılanlar ve dil
 
 ```js
-import { createModal } from '@onurdevs/confirm-modal';
+import { createModal } from '@onurdev/confirm-modal';
 
 export const modal = createModal({
   confirmText: 'Tamam',
