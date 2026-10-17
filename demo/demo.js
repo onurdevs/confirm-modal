@@ -154,16 +154,16 @@ function element(tag, className, text) {
   return node;
 }
 
-for (const example of examples) {
+for (const [index, example] of examples.entries()) {
   const card = element('button', 'example-card');
   card.type = 'button';
   card.dataset.demo = example.id;
   card.setAttribute('aria-label', `Try ${example.title}`);
   const top = element('span', 'card-top');
-  const icon = element('span', 'card-icon', example.icon);
+  const icon = element('span', 'card-icon', String(index + 1).padStart(2, '0'));
   icon.setAttribute('aria-hidden', 'true');
   top.append(icon, element('span', 'card-category', example.category));
-  const cta = element('span', 'card-cta', 'Try example');
+  const cta = element('span', 'card-cta', 'Explore');
   const arrow = element('span', '', '↗');
   arrow.setAttribute('aria-hidden', 'true');
   cta.append(arrow);
